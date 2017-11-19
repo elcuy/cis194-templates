@@ -25,7 +25,14 @@ module Golf where
 -- []
 
 skips :: [a] -> [[a]]
-skips = undefined
+skips list = [nthElements list n | n <- [1..(length list)]]
+
+-- Gets the elements in the positions dictated by a list comprehension
+-- that goes from the nth element and skips n positions until the end
+-- of the list.
+
+nthElements :: [a] -> Int -> [a]
+nthElements list n = [ list !! x | x <- [n - 1, n - 1 + n..length list - 1]]
 
 ----------------------------------------------------------------------
 -- Exercise 2
@@ -41,7 +48,10 @@ skips = undefined
 -- []
 
 localMaxima :: [Integer] -> [Integer]
-localMaxima = undefined
+localMaxima (a:b:c:rest)
+  | b > a && b > c = b : localMaxima (b:c:rest)
+  | otherwise      = localMaxima (b:c:rest)
+localMaxima _ = []
 
 ----------------------------------------------------------------------
 -- Exercise 3
@@ -53,4 +63,16 @@ localMaxima = undefined
 -- " *        \n *        \n *   *    \n==========\n0123456789\n"
 
 histogram :: [Integer] -> String
-histogram = undefined
+histogram list = printRows (countNums list) ++ "==========\n0123456789\n"
+
+countNums :: [Integer] -> [Integer]
+countNums list = [toInteger $ length $ filter (==n) list | n <- [0..9]];
+
+printRows :: [Integer] -> String
+printRows list
+  | isValid = printRows (map (subtract 1) list) ++  printRow list
+  | otherwise = ""
+  where isValid = length (filter (<1) list) < 10
+
+printRow :: [Integer] -> String
+printRow list = map (\n -> if n < 1 then ' ' else '*') list ++ "\n"
