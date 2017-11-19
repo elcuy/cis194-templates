@@ -10,7 +10,6 @@
 module LogAnalysis where
 
 import Log
-import Data.List (isInfixOf)
 
 ----------------------------------------------------------------------
 -- Exercise 1
@@ -96,17 +95,3 @@ whatWentWrong =  map getMessage . inOrder . build . filter isSevere
 ----------------------------------------------------------------------
 -- Exercise 6 (Optional)
 ----------------------------------------------------------------------
-
--- See what happened right before the mustardwatch was opened.
-whatWentWrong'' :: [LogMessage] -> [String]
-whatWentWrong'' messages = [ message | LogMessage _ timestamp message <- inOrder (build filteredMessages)]
-    where
-      filteredMessages = [x | x@(LogMessage _ timestamp _) <- messages, timestamp > 100 && timestamp < 130]
-      --filteredMessages = [x | x@(LogMessage Warning timestamp _) <- messages]
-
-
--- Look for all references to opening the mustardwatch.
-whatWentWrong''' :: [LogMessage] -> [String]
-whatWentWrong''' messages = [ message | LogMessage _ timestamp message <- inOrder (build filteredMessages)]
-    where
-      filteredMessages = [x | x@(LogMessage _ _ message) <- messages, "mustard" `isInfixOf` message || "Mustard" `isInfixOf` message || "watch" `isInfixOf` message || "open" `isInfixOf` message]
