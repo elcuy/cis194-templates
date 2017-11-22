@@ -7,6 +7,8 @@
 
 module Wholemeal where
 
+import Data.List
+
 ----------------------------------------------------------------------
 -- Exercise 1
 ----------------------------------------------------------------------
@@ -50,7 +52,16 @@ data Tree a =
     deriving (Show, Eq)
 
 foldTree :: [a] -> Tree a
-foldTree = undefined
+foldTree = foldr buildTree Leaf
+
+buildTree :: a -> Tree a -> Tree a
+buildTree a Leaf = Node 0 Leaf a Leaf
+buildTree a (Node _ l m r)
+   | height l <= height r = Node (height (buildTree a l) + 1) (buildTree a l) m r
+   | otherwise = Node (height (buildTree a r) + 1) l m (buildTree a r)
+  where
+    height Leaf = -1
+    height (Node h _ _ _) = h
 
 ----------------------------------------------------------------------
 -- Exercise 3
@@ -64,7 +75,11 @@ foldTree = undefined
 -- False
 
 xor :: [Bool] -> Bool
-xor = undefined
+xor = odd . foldr accumTrue 0
+
+accumTrue :: Bool -> Integer -> Integer
+accumTrue True acc = acc + 1
+accumTrue False acc = acc
 
 -- |
 --
@@ -72,16 +87,30 @@ xor = undefined
 -- [2,3,4]
 
 map' :: (a -> b) -> [a] -> [b]
-map' = undefined
+map' f = foldr myFun []
+  where
+    myFun value acc = f value : acc
+
+-- Could also be written like this but hlint cries :(
+-- map' f = foldr (\value acc -> f value : acc) []
 
 -- Optional
 
 myFoldl :: (a -> b -> a) -> a -> [b] -> a
-myFoldl = undefined
+myFoldl f acc list = foldr (flip f) acc (reverse list)
 
 ----------------------------------------------------------------------
 -- Exercise 4
 ----------------------------------------------------------------------
 
 sieveSundaram :: Integer -> [Integer]
-sieveSundaram = undefined
+sieveSundaram n = [1..n] \\ sieve n
+
+sieve :: Integer -> [Integer]
+sieve n = map calculate $ filter (\(i,j) -> calculate (i,j) <= n) (cartProd [1..n] [1..n])
+
+calculate :: (Integer, Integer) -> Integer
+calculate (i,j) = i + j + 2 * i * j
+
+cartProd :: [a] -> [b] -> [(a,b)]
+cartProd xs ys = [(x,y) | x <- xs, y <- ys]
